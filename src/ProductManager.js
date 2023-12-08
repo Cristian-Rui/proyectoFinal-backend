@@ -6,7 +6,7 @@ class ProductManager {
             this.products = []
     }
 
-    static id = 1;
+    static id = 1000000;
 
 
     //METODOS
@@ -25,9 +25,8 @@ class ProductManager {
     async addProduct(product) {
         //VALIDACION CAMPOS OBLIGATTORIOS
         try {
-            if (!product.title || !product.description || !product.price || !product.thumbnail || !product.code || !product.stock) {
-                console.error('Todos los campos son obligatorios.');
-                return;
+            if (!product.title || !product.description || !product.price || !product.thumbnail || !product.code || !product.stock || !product.category || !product.status) {
+                throw new Error('Todos los campos son obligatorios.');
             }
 
             const newProduct = {
@@ -37,25 +36,26 @@ class ProductManager {
                 price: product.price,
                 thumbnail: product.thumbnail,
                 code: product.code,
-                stock: product.stock
+                stock: product.stock,
+                category: product.category,
+                status : product.status
             }
 
             const productExists = this.products.find(p => p.code === newProduct.code);
             if (productExists) {
-                console.error('El código del producto ya está en uso.');
-                return;
+                throw new Error('El código del producto ya está en uso.');
             }
 
             ProductManager.id++
 
             this.products.push(newProduct);
 
-            await this.reloadClean();
+            //await this.reloadClean();
 
             await fs.promises.writeFile(this.path, JSON.stringify(this.products), 'utf-8');
 
         } catch (error) {
-            return console.error('error al cargar el producto', error);
+            throw new Error('Error al cargar el producto', error);
         }
 
     }
