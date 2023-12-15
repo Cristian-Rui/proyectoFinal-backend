@@ -1,11 +1,15 @@
-const idValidation = (req, res, next) => {
-    const { id } = req.params;
+import * as fs from 'fs';
+import ProductManager from '../ProductManager.js';
+const productManager = new ProductManager('./src/productos.json')
 
-    if (!productList.some(u => u.id === id)) {
-        return res.status(404).send({message: 'product not found'});
-    };
-
-    next()
+//MIDDLEWARES
+const checkProduct = (req, res, next) => {
+    const { title, description, price, code, stock, category, status } = req.body;
+    console.log({ title, description, price, code, stock, category, status });
+    if (!title || !description || !price || !code || !stock || !category || !status) {
+        return res.status(400).send({ message: 'Incomplete product' })
+    }
+    next();
 };
 
-export default idValidation;
+export { checkProduct };

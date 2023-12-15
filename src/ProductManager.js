@@ -7,28 +7,20 @@ class ProductManager {
     }
 
     async addProduct(product) {
-        if (!product.title ||
-            !product.description ||
-            !product.price ||
-            !product.thumbnail ||
-            !product.code ||
-            !product.stock ||
-            !product.category ||
-            !product.status) {
-
-            return console.error('Todos los campos son obligatorios.');
-        };
-
+        if (!product.title || !product.description || !product.price || !product.thumbnail || !product.code || !product.stock|| !product.category || !product.status) {
+            console.error('Todos los campos son obligatorios.');
+            return false;
+        }
         const productList = await this.getProducts();
         const idProduct = Date.now();
 
         const newProduct = {
             title: product.title,
             description: product.description,
-            price: product.price,
+            price: parseInt(product.price),
             thumbnail: product.thumbnail,
             code: product.code,
-            stock: product.stock,
+            stock: parseInt(product.stock),
             category: product.category,
             status: product.status,
             id: idProduct
@@ -36,13 +28,14 @@ class ProductManager {
 
         const productExists = productList.find(p => p.code === newProduct.code);
         if (productExists) {
-            return console.error('El código del producto ya está en uso.');
+            console.error('El código del producto ya está en uso.');
+            return false;
         };
 
         productList.push(newProduct);
 
         await fs.promises.writeFile(this.path, JSON.stringify(productList), 'utf-8');
-
+        return true; 
     }
 
 
@@ -71,7 +64,6 @@ class ProductManager {
 
 
     async deleteProduct(idProduct) {
-
         const productList = await this.getProducts();
 
         if (!productList.some(p => p.id === idProduct)) {
@@ -82,6 +74,8 @@ class ProductManager {
         const productDelete = productList.filter(p => p.id !== idProduct);
 
         await fs.promises.writeFile(this.path, JSON.stringify(productDelete), 'utf-8');
+        
+        return true;
     }
 
 

@@ -1,9 +1,7 @@
-import * as fs from 'fs';
 import { Router } from "express";
 import { uploader } from '../utils/multer.js'
 import ProductManager from "../ProductManager.js";
-
-
+import { checkProduct } from '../utils/middlewares.js';
 
 const productsRoutes = Router();
 const productManager = new ProductManager('./src/productos.json')
@@ -35,11 +33,16 @@ productsRoutes.get('/:pid', async (req, res) => {
 })
 
 
-productsRoutes.post('/', async (req, res) => {
+productsRoutes.post('/', uploader.single('thumbnail'),  async (req, res) => {
     try {
-        let product = req.body;
+        let product = JSON.parse(JSON.stringify(req.body))
+        const path = req.file.path.split('public').join('');   
 
-        await productManager.addProduct(product);
+        const addingProduct = await productManager.addProduct({...product, thumbnail:path});
+
+        if(!addingProduct){
+            return res.status(400).send({ error: 'error al agregar el producto, verifique que esten los campos completos o que el codigo sea valido' });
+        }
 
         res.send({ message: 'Producto agregado' });
     } catch (error) {
@@ -56,7 +59,7 @@ productsRoutes.put('/:pid', async (req, res) => {
 
         let productUpdated = await productManager.updateProduct(parseInt(id.pid), productToUpdate);
 
-        if(!productUpdated){
+        if (!productUpdated) {
             return res.status(404).send({ error: 'product not found' });
         }
         return res.send({ message: 'Producto actualizado' });
@@ -73,14 +76,14 @@ productsRoutes.delete('/:pid', async (req, res) => {
 
         let productDeleted = await productManager.deleteProduct(parseInt(pid));
 
-        if(!productDeleted){
+        if (!productDeleted) {
             return res.status(404).send({ error: 'product not found' });
         }
 
-        return res.send({ message:'producto eliminado con exito' });
+        return res.send({ message: 'producto eliminado con exito' });
     } catch {
         console.error('no se pudo eliminar el producto', error);
-        return res.status(400).send({ error: 'error al eliminar el producto'});
+        return res.status(400).send({ error: 'error al eliminar el producto' });
 
     }
 
