@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { uploader } from '../utils/multer.js'
 import ProductManager from "../ProductManager.js";
-import { checkProduct } from '../utils/middlewares.js';
 
 const productsRoutes = Router();
 const productManager = new ProductManager('./src/productos.json')
@@ -9,15 +8,8 @@ const productManager = new ProductManager('./src/productos.json')
 let productList = await productManager.getProducts();
 
 productsRoutes.get('/', async (req, res) => {
-    const { limit } = req.query;
-
-    if (!limit || limit >= productList.length) {
-        return res.send({ productList });
-    };
-
-    const limitedList = productList.splice(0, limit);
-    return res.send({ limitedList });
-
+    console.log(productList)
+    res.render('home', { productList });
 })
 
 productsRoutes.get('/:pid', async (req, res) => {
@@ -33,14 +25,14 @@ productsRoutes.get('/:pid', async (req, res) => {
 })
 
 
-productsRoutes.post('/', uploader.single('thumbnail'),  async (req, res) => {
+productsRoutes.post('/', uploader.single('thumbnail'), async (req, res) => {
     try {
         let product = JSON.parse(JSON.stringify(req.body))
-        const path = req.file.path.split('public').join('');   
+        const path = req.file.path.split('public').join('');
 
-        const addingProduct = await productManager.addProduct({...product, thumbnail:path});
+        const addingProduct = await productManager.addProduct({ ...product, thumbnail: path });
 
-        if(!addingProduct){
+        if (!addingProduct) {
             return res.status(400).send({ error: 'error al agregar el producto, verifique que esten los campos completos o que el codigo sea valido' });
         }
 

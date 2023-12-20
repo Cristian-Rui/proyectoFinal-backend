@@ -1,0 +1,17 @@
+<h1>LISTA DE PRODUCTOS</h1>
+<h2>Productos:</h2>
+<section style="display: flex; flex-direction: column">
+        {{#each productList}}
+        <div style="border: 1px solid black; margin:3px; width: 50%;">
+        <img src="{{this.thumbnail}}" style="width: 300px; height:300px;" alt="{{this.title}}">
+        <h3>{{this.title}}</h3>
+        <p>precio: ${{this.price}}</p>
+        <p>{{this.description}}</p>
+        <p>codigo:{{this.code}}</p>
+        <p>stock: {{this.stock}}</p>
+        <p>categoria: {{this.category}}</p>
+        <p>id: {{this.id}}</p>
+        <p style="color: greenyellow;">status: {{this.status}}</p>
+        </div>
+        {{/each}}
+</section>

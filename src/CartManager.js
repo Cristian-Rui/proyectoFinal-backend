@@ -26,7 +26,7 @@ class CartManager {
             const parseDatos = JSON.parse(datos);
             return parseDatos;
         } catch (error) {
-            console.log('no hay datos');
+            console.log('no hay datos en carrito');
             return [];
         };
 
