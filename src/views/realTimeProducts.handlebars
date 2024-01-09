@@ -1,21 +1,29 @@
 <h1 style=color:blue>CARGAR PRODUCTO</h1>
 
-<form action="/api/products" method="post" enctype="multipart/form-data"
-    style="display: flex; flex-direction: column; width: 50%;">
-    <label for="title">nombre:</label><Input id="title" name="title" type="text"></Input>
+<form method="post" enctype="multipart/form-data"
+    style="display: flex; flex-direction: column; width: 50%;" id="form_product">
+    <label for="title">nombre:</label><input id="title" name="title" type="text"></input>
     <label for="description">descripcion del producto:</label><textarea id="description" name="description" type="text"
         style="height: 182px"></textarea>
-    <label for="price">precio:</label><Input id="price" name="price" type="number"></Input>
-    <label for="thumbnail">imagen del producto:</label><Input id="thumbnail" name="thumbnail" type="file"
-        required></Input>
-    <label for="code">codigo del producto:</label><Input id="code" name="code" type="text"></Input>
-    <label for="stock">cantidad en stock:</label><Input id="stock" name="stock" type="number"></Input>
-    <label for="category">categoria:</label><Input id="category" name="category" type="text"></Input>
-    <label for="status">status:</label><Input id="status" name="status" type="text" placeholder="true o false"></Input>
+    <label for="price">precio:</label><input id="price" name="price" type="number"></input>
+    <label for="thumbnail">imagen del producto:</label><input id="thumbnail" name="thumbnail" type="file"
+        required></input>
+    <label for="code">codigo del producto:</label><input id="code" name="code" type="text"></input>
+    <label for="stock">cantidad en stock:</label><input id="stock" name="stock" type="number"></input>
+    <label for="category">categoria:</label><input id="category" name="category" type="text"></input>
+    <label for="productStatus">status:</label><input id="productStatus" name="productStatus" type="text" placeholder="true o false"></input>
     <button type="submit" id="sendProduct">agregar producto</button>
 </form>
 
+<section>
+    <div class="row justify-content-around" id="seccion_product">
 
+
+    </div>
+</section>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="js/index.js"></script>
 
 
 

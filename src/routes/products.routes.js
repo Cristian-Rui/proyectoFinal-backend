@@ -8,7 +8,12 @@ const productManager = new ProductManager('./src/productos.json')
 let productList = await productManager.getProducts();
 
 productsRoutes.get('/', async (req, res) => {
-    console.log(productList)
+    const { limit } = req.query;
+    if (!limit) {
+        productList
+    } else {
+        productList = productList.splice(0, limit);
+    }
     res.render('home', { productList });
 })
 
@@ -27,15 +32,21 @@ productsRoutes.get('/:pid', async (req, res) => {
 
 productsRoutes.post('/', uploader.single('thumbnail'), async (req, res) => {
     try {
-        let product = JSON.parse(JSON.stringify(req.body))
+        let product = req.body;
         const path = req.file.path.split('public').join('');
+        const newProduct = {
+            ...product,
+            thumbnail: path
+        }
 
-        const addingProduct = await productManager.addProduct({ ...product, thumbnail: path });
+        const addingProduct = await productManager.addProduct(newProduct);
 
         if (!addingProduct) {
             return res.status(400).send({ error: 'error al agregar el producto, verifique que esten los campos completos o que el codigo sea valido' });
         }
 
+        const productList = await productManager.getProducts()
+        req.io.sockets.emit('update-products', productList);
         res.send({ message: 'Producto agregado' });
     } catch (error) {
         console.error('Error al agregar el producto:', error);
