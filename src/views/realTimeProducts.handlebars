@@ -1,8 +1,8 @@
 <section class="container">
     <h1 style=color:blue>CARGAR PRODUCTO</h1>
 
-<form method="post" enctype="multipart/form-data"
-    style="display: flex; flex-direction: column; width: 50%;" id="form_product">
+<form action="/api/products" method="post" enctype="multipart/form-data"
+    style="display: flex; flex-direction: column; width: 50%;" id="form">
     <label for="title">nombre:</label><input id="title" name="title" type="text"></input>
     <label for="description">descripcion del producto:</label><textarea id="description" name="description" type="text"
         style="height: 182px"></textarea>
@@ -17,7 +17,7 @@
 </form>
 
 <section>
-    <div class="row justify-content-around" id="seccionProduct">
+    <div class="row justify-content-around" id="sectionProducts">
 
 
     </div>

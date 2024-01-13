@@ -18,7 +18,7 @@ socket.on('update-products', (products) => {
 
     products.forEach((product) => {
         productList.innerHTML += `
-        <div class="card col-4 m-1 productItem" data-id='${product.id}'>
+        <div class="card col-4 m-1 productItem" data-id='${product._id}'>
             <img src="${product.thumbnail}" class="card-img-top img-fluid" alt="${product.title}">
             <div class="card-body">
                     <h3 class="card-title">${product.title}</h3>
