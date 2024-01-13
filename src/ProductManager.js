@@ -7,7 +7,7 @@ class ProductManager {
     }
 
     async addProduct(product) {
-        if (!product.title || !product.description || !product.price || !product.thumbnail || !product.code || !product.stock|| !product.category || !product.status) {
+        if (!product.title || !product.description || !product.price || !product.thumbnail || !product.code || !product.stock || !product.category || !product.productStatus) {
             console.error('Todos los campos son obligatorios.');
             return false;
         }
@@ -22,7 +22,7 @@ class ProductManager {
             code: product.code,
             stock: parseInt(product.stock),
             category: product.category,
-            status: product.status,
+            productStatus: product.productStatus,
             id: idProduct
         };
 
@@ -35,7 +35,7 @@ class ProductManager {
         productList.push(newProduct);
 
         await fs.promises.writeFile(this.path, JSON.stringify(productList), 'utf-8');
-        return true; 
+        return true;
     }
 
 
@@ -74,7 +74,7 @@ class ProductManager {
         const productDelete = productList.filter(p => p.id !== idProduct);
 
         await fs.promises.writeFile(this.path, JSON.stringify(productDelete), 'utf-8');
-        
+
         return true;
     }
 

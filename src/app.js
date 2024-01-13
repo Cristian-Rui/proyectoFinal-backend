@@ -30,6 +30,7 @@ const httpServer = app.listen(PORT, () => {
     console.log(`servidor funcionando en puerto ${PORT}`);
 });
 
+
 export const io = new Server(httpServer);
 
 io.on('connection', socket => {
