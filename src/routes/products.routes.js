@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { uploader } from '../utils/multer.js'
 import ProductManager from "../ProductManager.js";
+import { io } from '../app.js';
 
 const productsRoutes = Router();
 const productManager = new ProductManager('./src/productos.json')
@@ -36,7 +37,11 @@ productsRoutes.post('/', uploader.single('thumbnail'), async (req, res) => {
             return res.status(400).send({ error: 'error al agregar el producto, verifique que esten los campos completos o que el codigo sea valido' });
         }
 
-        res.send({ message: 'Producto agregado' });
+        const products = await productManager.getProducts();
+
+        io.emit('update-products', products);
+
+        res.redirect('/realtimeproducts');
     } catch (error) {
         console.error('Error al agregar el producto:', error);
         res.status(500).send({ error: 'Error al agregar el producto' });
