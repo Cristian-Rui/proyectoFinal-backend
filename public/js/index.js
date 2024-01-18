@@ -2,13 +2,13 @@ const socket = io();
 
 const form = document.getElementById('form');
 
-document.addEventListener('DOMContentLoaded', ()=>{
+document.addEventListener('DOMContentLoaded', () => {
     socket.emit('loadProducts')
 })
 
 form.addEventListener('sumbit', (e) => {
-        e.preventDefault();
-        form.reset();
+    e.preventDefault();
+    form.reset();
 })
 
 socket.on('update-products', (products) => {
@@ -18,7 +18,7 @@ socket.on('update-products', (products) => {
 
     products.forEach((product) => {
         productList.innerHTML += `
-        <div class="card col-4 m-1 productItem" data-id='${product._id}'>
+        <div class="card col-4 m-1 productItem" data-id='${product.id}'>
             <img src="${product.thumbnail}" class="card-img-top img-fluid" alt="${product.title}">
             <div class="card-body">
                     <h3 class="card-title">${product.title}</h3>
@@ -32,22 +32,21 @@ socket.on('update-products', (products) => {
             </ul>
             <div class="card-body">
                     <button type="button" class="btn btn-success ">comprar</button>
-                    <button type="button" class="btn btn-danger id="delete-button">eliminar</button>
+                    <button type="button" class="btn btn-danger">eliminar</button>
             </div>
         </div>
         `;
     });
 
-    // document.getElementById('delete-button').forEach((button) => {
-    //     button.addEventListener('click', (event) => {
-    //         const productItem = event.target.closest('.productItem');
-    //         const productId = productItem.dataset.id;
+    document.querySelectorAll('.productItem').forEach((button) => {
+        button.addEventListener('click', (event) => {
+            const productItem = event.target.closest('.productItem');
+            const productId = parseInt(productItem.dataset.id) ;
 
-    //         console.log('btn delete clicked');
+            console.log('btn delete clicked', productId);
 
-    //         // Emit a 'delete-product' event
-    //         socket.emit('delete-product', productId);
+            socket.emit('delete-product', productId);
 
-    //     })
-    // })
+        })
+    })
 })
