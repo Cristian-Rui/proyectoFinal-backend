@@ -17,3 +17,7 @@ a {
 ul {
     list-style: none;
 }
+
+.chat-h1 {
+    color: blueviolet;
+}

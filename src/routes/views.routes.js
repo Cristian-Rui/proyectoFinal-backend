@@ -1,22 +1,26 @@
 import { Router } from "express";
-import ProductManager from "../ProductManager.js";
+import { productModel } from "../dao/models/product.model.js";
 
 const viewsRoutes = Router();
-const productManager = new ProductManager('./src/productos.json');
-let productList = await productManager.getProducts();
 
-viewsRoutes.get('/', (req, res) => {
-    const { limit } = req.query;
-    if (!limit){
-        productList
-    }else{
-        productList = productList.splice(0, limit);
+
+viewsRoutes.get('/', async (req, res) => {
+    try {
+        const productList = await productModel.find().lean();
+
+        res.status(200).render('home', { productList });
+    } catch (error) {
+        console.error(error);
+        res.status(400).json({ message: 'users not found' });
     }
-    res.render('home', { productList });
 })
 
 viewsRoutes.get('/realTimeProducts', (req, res) => {
     res.render('realTimeProducts')
 })
+
+viewsRoutes.get('/chat', (req, res) => {
+    res.render('chat');
+});
 
 export default viewsRoutes;

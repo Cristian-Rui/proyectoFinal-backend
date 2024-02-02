@@ -1,12 +1,11 @@
 import mongoose, { Mongoose } from "mongoose";
 
-const productCollection = 'productos'
+const productCollection = 'products'
 
 const productSchema = mongoose.Schema({
     title: { 
         required: true,
-        type:String,
-        unique: true
+        type:String
     },
     description: {
         required: true, 

@@ -1,32 +1,30 @@
 <section class="container">
     <h1 style=color:blue>CARGAR PRODUCTO</h1>
 
-<form action="/api/products" method="post" enctype="multipart/form-data"
-    style="display: flex; flex-direction: column; width: 50%;" id="form">
-    <label for="title">nombre:</label><input id="title" name="title" type="text"></input>
-    <label for="description">descripcion del producto:</label><textarea id="description" name="description" type="text"
-        style="height: 182px"></textarea>
-    <label for="price">precio:</label><input id="price" name="price" type="number"></input>
-    <label for="thumbnail">imagen del producto:</label><input id="thumbnail" name="thumbnail" type="file"
-        required></input>
-    <label for="code">codigo del producto:</label><input id="code" name="code" type="text"></input>
-    <label for="stock">cantidad en stock:</label><input id="stock" name="stock" type="number"></input>
-    <label for="category">categoria:</label><input id="category" name="category" type="text"></input>
-    <label for="productStatus">status:</label><input id="productStatus" name="productStatus" type="text" placeholder="true o false"></input>
-    <button type="submit" id="sendProduct">agregar producto</button>
-</form>
+    <form action="/api/products" method="post" enctype="multipart/form-data"
+        style="" id="form" class="d-flex flex-column w-50">
+        <label for="title">nombre:</label><input id="title" name="title" type="text"></input>
+        <label for="description">descripcion del producto:</label><textarea id="description" name="description"
+            type="text" style="height: 182px"></textarea>
+        <label for="price">precio:</label><input id="price" name="price" type="number"></input>
+        <label for="thumbnail">imagen del producto:</label><input id="thumbnail" name="thumbnail" type="file"
+            required></input>
+        <label for="code">codigo del producto:</label><input id="code" name="code" type="text"></input>
+        <label for="stock">cantidad en stock:</label><input id="stock" name="stock" type="number"></input>
+        <label for="category">categoria:</label><input id="category" name="category" type="text"></input>
+        <label for="productStatus">status:</label><input type="text" id="productStatus" name="productStatus" placeholder="true o false"></input>
+        <button type="submit" id="sendProduct">agregar producto</button>
+    </form>
 
-<section>
-    <div class="row justify-content-around" id="sectionProducts">
-
-
-    </div>
-</section>
-
-<script src="/socket.io/socket.io.js"></script>
-<script src="js/index.js"></script>
+    <section>
+        <div class="row justify-content-around" id="sectionProducts">
 
 
+        </div>
+    </section>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/index.js"></script>
 
 
 
@@ -37,6 +35,8 @@
 
 
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="/socket.io/socket.io.js"></script>
-<script src="js/index.js"></script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/index.js"></script>

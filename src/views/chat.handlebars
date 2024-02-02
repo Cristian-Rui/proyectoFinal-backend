@@ -1,0 +1,17 @@
+<body class="body-chat">
+    <section class="container">
+        <div class="row d-flex justify-content-center">
+            <h1 class="fst-italic text-decoration-underline text-center chat-h1 m-2 col-6">Ayuda en linea</h1>
+            <textarea id="inputData" name="mensaje" rows="4" cols="50" class="text-start textarea-chat col-6">
+            Escribe tu mensaje aquí.
+            </textarea>
+        </div>
+        <div class="row justify-content-center">
+            <div id="outputData" class="col-9 d-flex flex-column align-items-center"></div>
+        </div>
+    </section>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="js/chat.js"></script>

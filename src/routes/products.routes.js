@@ -1,98 +1,91 @@
 import { Router } from "express";
 import { uploader } from '../utils/multer.js'
-import ProductManager from "../ProductManager.js";
+//import ProductManager from "../dao/managerFS/ProductManager.js";
 import { io } from '../app.js';
-import { productModel } from "../models/product.model.js";
+import ProductMongoManager from "../dao/managerDB/ProductMongoManager.js";
 
 
 const productsRoutes = Router();
-const productManager = new ProductManager('./src/productos.json')
-
-let productList = await productManager.getProducts();
+//const productManager = new ProductManager('./src/productos.json')
+const productMongoManager = new ProductMongoManager();
 
 productsRoutes.get('/', async (req, res) => {
-    const { limit } = req.query;
-    if (!limit) {
-        productList
-    } else {
-        productList = productList.splice(0, limit);
+    try {
+        productList = await productMongoManager.getProducts();
+        res.status(200).render('home', { productList });
+    } catch (error) {
+        res.status(500).json({ message: 'There was a problem', error: error });
     }
-    res.render('home', { productList });
+
 })
 
-productsRoutes.get('/:pid', async (req, res) => {
-    const { pid } = req.params;
+productsRoutes.get('/:productId', async (req, res) => {
+    try {
+        const { productId } = req.params;
 
-    const productById = await productManager.getProductById(parseInt(pid));
+        const productById = await productMongoManager.getProductById(productId);
 
-    if (!productById) {
-        return res.status(404).send({ message: 'product not found' })
-    };
+        if (!productById) {
+            return res.status(404).send({ message: 'product not found' })
+        };
 
-    res.send({ productById })
+        res.status(200).json({ productById });
+    } catch (error) {
+        res.status(500).json({ message: 'There was a problem', error: error });
+    }
 })
 
 
 productsRoutes.post('/', uploader.single('thumbnail'), async (req, res) => {
-    try {
-        let product = req.body;
-        const path = req.file.path.split('public').join('');
-        const newProduct = {
-            ...product,
-            thumbnail: path
-        }
+    let  product  = req.body;
+    const path = req.file.path.split('public').join('');
 
-        const addingProduct = await productManager.addProduct(newProduct);
+    try {
+        const addingProduct = await productMongoManager.addProduct({ ...product, thumbnail: path })
 
         if (!addingProduct) {
-            return res.status(400).send({ error: 'error al agregar el producto, verifique que esten los campos completos o que el codigo sea valido' });
+            return res.status(400).json({ message: 'There was a problem adding the product' })
         }
 
-        const products = await productManager.getProducts();
+        io.emit('update-products', await productMongoManager.getProducts());
 
-        io.emit('update-products', products);
-
-        res.redirect('/realtimeproducts');
+        res.status(201).redirect('/realtimeproducts');
     } catch (error) {
-        console.error('Error al agregar el producto:', error);
-        res.status(500).send({ error: 'Error al agregar el producto' });
-    }
+        res.status(500).json({ message: 'There was a problem', error: error });
+    };
 });
 
 
-productsRoutes.put('/:pid', async (req, res) => {
+productsRoutes.put('/:productId', async (req, res) => {
     try {
-        let productToUpdate = req.body;
-        const id = req.params;
+        const { productId } = req.params;
+        let propertiesToUpdate = req.body;
 
-        let productUpdated = await productManager.updateProduct(parseInt(id.pid), productToUpdate);
+        let productUpdated = await productMongoManager.updateProduct(productId, propertiesToUpdate);
 
         if (!productUpdated) {
-            return res.status(404).send({ error: 'product not found' });
+            return res.status(404).json({ error: 'There was a problem finding the product' });
         }
-        return res.send({ message: 'Producto actualizado' });
+        res.status(200).json({ message: 'Product updated' });
 
     } catch (error) {
-        console.error(error)
-        return res.status(500).send({ error: 'Error al agregar el producto' });
+        res.status(500).json({ message: 'There was a problem', error: error });
     }
 });
 
-productsRoutes.delete('/:pid', async (req, res) => {
+productsRoutes.delete('/:productId', async (req, res) => {
     try {
-        const { pid } = req.params;
+        const { productId } = req.params;
 
-        let productDeleted = await productManager.deleteProduct(parseInt(pid));
+        let productDeleted = await productMongoManager.deleteProduct(productId);
 
         if (!productDeleted) {
-            return res.status(404).send({ error: 'product not found' });
+            return res.status(404).json({ error: 'There was a problem finding the product' });
         }
 
-        return res.send({ message: 'producto eliminado con exito' });
+        res.status(200).json({ message: 'Product deleted' });
     } catch {
-        console.error('no se pudo eliminar el producto', error);
-        return res.status(400).send({ error: 'error al eliminar el producto' });
-
+        res.status(500).json({ message: 'There was a problem', error: error });
     }
 
 })

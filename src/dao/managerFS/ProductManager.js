@@ -1,4 +1,3 @@
-import { error } from 'console';
 import * as fs from 'fs';
 
 class ProductManager {

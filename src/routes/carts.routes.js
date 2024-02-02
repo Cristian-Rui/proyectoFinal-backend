@@ -1,52 +1,60 @@
 import { Router } from "express";
-import { uploader } from '../utils/multer.js'
-import CartManager from "../CartManager.js";
+//import CartManager from "../dao/managerFS/CartManager.js";
+import CartMongoManager from "../dao/managerDB/CartMongoManager.js";
 
 const cartRoutes = Router();
-const cartManager = new CartManager('./src/carts.json')
-const carts = await cartManager.getCarts()
+//const cartManager = new CartManager('./src/carts.json')
+//const carts = await cartManager.getCarts()
+const cartMongoManager = new CartMongoManager();
 
 cartRoutes.get('/', async (req, res) => {
-    return res.send(carts)
-})
+    try {
+        const cartList = await cartMongoManager.getCarts();
+        res.status(200).json(cartList);
+    } catch (error) {
+        res.status(500).json({ message: 'There was a problem', error: error });
+    }
+});
 
 cartRoutes.post('/', async (req, res) => {
-    const newCart = await cartManager.addCart();
-    return res.send({ message: 'carrito creado con exito' })
-})
-
-cartRoutes.get('/:cid', async (req, res) => {
     try {
-        const { cid } = req.params;
+        await cartMongoManager.addCart();
+        res.status(200).json({ message: 'cart created successfully' })
+    } catch (error) {
+        res.status(500).json({ message: 'There was a problem', error: error });
+    }
+});
 
-        const cartById = await cartManager.getProductsOfCart(parseInt(cid))
+cartRoutes.get('/:cartId', async (req, res) => {
+    try {
+        const { cartId } = req.params;
 
-        if (!cartById) {
-            return res.status(404).send({ message: 'product not found' })
+        const productsCartById = await cartMongoManager.getProductsOfCart(cartId)
+
+        if (!productsCartById) {
+            return res.status(404).send({ message: 'Products not found' })
         };
 
-        return res.send({ cartById })
+        res.status(200).json({ productsCartById })
     } catch (error) {
-        return res.status(500).send({ error: 'error al obtener productos' });
+        res.status(500).json({ message: 'There was a problem', error: error });
     }
-})
+});
 
-cartRoutes.post('/:cid/product/:pid', async (req, res) => {
-    const { cid, pid } = req.params;
+cartRoutes.post('/:cartId/product/:productId', async (req, res) => {
+    try {
+        const { cartId, productId } = req.params;
 
-    const addingProduct = await cartManager.addProductToCart(parseInt(cid), parseInt(pid));
+        const addingProduct = await cartMongoManager.addProductToCart(cartId, productId);
 
-    if (!addingProduct) {
-        return res.status(400).send({ error: 'error al agregar producto' })
+        if (!addingProduct) {
+            return res.status(400).send({ error: 'Error when adding product to cart' })
+        }
+
+        res.status(200).json({ message: 'product successfully added' })
+    } catch (error) {
+        res.status(500).json({ message: 'There was a problem', error: error });
     }
-
-    res.send({ message: 'producto agregado con exito' })
-
-
-
-
-
-
 })
 
 
