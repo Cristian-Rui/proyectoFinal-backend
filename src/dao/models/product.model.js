@@ -5,7 +5,8 @@ const productCollection = 'products'
 const productSchema = mongoose.Schema({
     title: { 
         required: true,
-        type:String
+        type:String,
+        index: true
     },
     description: {
         required: true, 
@@ -23,7 +24,8 @@ const productSchema = mongoose.Schema({
     code: { 
         required: true,
         type:String,
-        unique: true
+        unique: true,
+        index: true
     },
     stock:{ 
         required: true,

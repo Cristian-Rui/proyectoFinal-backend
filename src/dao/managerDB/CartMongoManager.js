@@ -4,7 +4,7 @@ class CartMongoManager {
 
     async getCarts() {
         try {
-            const cartList = await cartModel.find().lean();
+            const cartList = await cartModel.find().lean()
             return cartList;
         } catch (error) {
             console.error('There was a problem finding the carts', error);
@@ -71,7 +71,7 @@ class CartMongoManager {
     }
     async getProductsOfCart(cartId) {
         try {
-            const cartProductsList = await cartModel.find({ _id: cartId }, { products: 1 });
+            const cartProductsList = await cartModel.find({ _id: cartId })
             if (!cartProductsList) {
                 return (false, { message: 'There was a problem finding the cart' })
             }

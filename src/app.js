@@ -22,7 +22,13 @@ app.use(express.static('public'));
 
 mongoose.connect('mongodb+srv://cristianrui98:cristian3564332149@cristian.sevvzhl.mongodb.net/ecommerce')
 
-app.engine('handlebars', handlebars.engine());
+const hbs = handlebars.create({
+    runtimeOptions: {
+        allowProtoPropertiesByDefault: true
+    }
+});
+
+app.engine('handlebars', hbs.engine());
 app.set('views', 'src/views');
 app.set('view engine', 'handlebars');
 
@@ -62,7 +68,7 @@ io.on('connection', socket => {
         try {
             const { user, message } = data;
             const newMessage = await messageModel.create({ user, message });
-            
+
             const allMessages = await messageModel.find({});
 
             io.emit('allMessages', allMessages);
@@ -73,7 +79,7 @@ io.on('connection', socket => {
 
     });
 
-    socket.on('newUser', data =>{
+    socket.on('newUser', data => {
         io.emit('newConnection', 'un nuevo usuario se conecto');
         socket.broadcast.emit('notification', data);
     })
