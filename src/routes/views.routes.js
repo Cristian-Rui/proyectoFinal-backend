@@ -73,7 +73,9 @@ viewsRoutes.get('/carts/:cartId', async (req, res) => {
         const { cartId } = req.params;
 
         const productList = await cartMongoManager.getProductsOfCart(cartId);
-        console.log(productList)
+        productList.forEach((product) => {
+            product.totalPrice = product.product.price * product.quantity;
+        })
         res.render('cart', { productList, title: 'Carrito', style: 'style.css' })
 
     } catch (error) {

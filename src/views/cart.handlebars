@@ -1,19 +1,22 @@
 <h1>Carrito: </h1>
 <section class="container">
+    {{#each productList}}
     <div class="card mb-3 row" >
         <div class="row g-0">
-            <div class="col-md-4">
-                <img src="/img/170665553572220240120_143900.jpg" class="bd-placeholder-img img-fluid rounded-start" width="100%" height="250" alt="">
+            <div class="col-md-2">
+                <img src="{{this.product.thumbnail}}" class="bd-placeholder-img img-fluid rounded-start" width="100%" height="75" alt="{{this.product.title}}">
             </div>
-            <div class="col-md-8">
+            <div class="col-md-10 d-flex flex-row">
                 <div class="card-body">
-                    <h5 class="card-title">Título de la tarjeta</h5>
-                    <p class="card-text">Esta es una tarjeta más amplia con texto de respaldo a continuación como
-                        introducción natural al contenido adicional. Este contenido es un poco más largo.</p>
-                    <p class="card-text"><small class="text-body-secondary">Última actualización hace 3
-                            minutos</small></p>
+                    <h2 class="card-title">{{this.product.title}}</h2>
+                    <h3 class="card-text">cantidad: {{this.quantity}}</h3>
+                </div>
+                <div class="card-body">
+                    <h4>precio unitario: ${{this.product.price}}</h4>
+                    <h4>precio total: $ {{this.totalPrice}}</h4>
                 </div>
             </div>
         </div>
     </div>
+    {{/each}}
 </section>
