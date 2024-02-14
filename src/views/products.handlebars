@@ -1,0 +1,52 @@
+<h1>LISTA DE PRODUCTOS</h1>
+<h2>Productos:</h2>
+<section class="container">
+    <div class="row justify-content-around">
+        {{#each payload}}
+        <div class="card col-4 m-1">
+            <img src="{{this.thumbnail}}" class="card-img-top img-fluid" alt="{{this.title}}">
+            <div class="card-body">
+                <h3 class="card-title">{{this.title}}</h3>
+                <h4 class="card-title">precio: ${{this.price}}</h4>
+                <p class="card-text">{{this.description}}</p>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">codigo:{{this.code}}</li>
+                <li class="list-group-item">stock: {{this.stock}}</li>
+                <li class="list-group-item">categoria: {{this.category}}</li>
+                <li class="list-group-item">id: {{this._id}}</li>
+                <li class="list-group-item text-success">status: {{this.productStatus}}</li>
+            </ul>
+            <div class="card-body">
+                <button type="button" class="btn btn-success w-100 addCartButton" data-id='{{this._id}}'>Añadir al
+                    carrito</button>
+            </div>
+            <div class="card-body">
+                <a href="/products/{{this.id}}" class="btn btn-success w-100">Ver en detalle</a>
+            </div>
+
+        </div>
+        {{/each}}
+    </div>
+</section>
+<section class="container my-5">
+    <nav aria-label="Ejemplo de navegación de página" class="">
+        <ul class="pagination justify-content-center">
+            <li class="page-item"><a class="page-link" href="{{productList.prevLink}}">Anterior</a></li>
+            {{!-- <li class="page-item"><a class="page-link"
+                    href="/products?page={{productList.page+ 2}}">{{+productList.page + 2 }}</a>
+            </li>
+            <li class="page-item"><a class="page-link"
+                    href="/products?page={{productList.page + 3}}">{{+productList.page + 3 }}</a>
+            </li>
+            <li class="page-item"><a class="page-link"
+                    href="/products?page={{productList.page + 4}}">{{+productList.page + 4 }}</a>
+            </li> --}}
+            <li class="page-item"><a class="page-link" href="{{productList.nextLink}}">Siguiente</a></li>
+        </ul>
+    </nav>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="js/products.js"></script>

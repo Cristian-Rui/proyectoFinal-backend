@@ -3,16 +3,16 @@ import { Server } from "socket.io";
 import handlebars from 'express-handlebars'
 import productsRoutes from './routes/products.routes.js';
 import cartRoutes from './routes/carts.routes.js';
-import viewsRoutes from './routes/views.routes.js';
-//import ProductManager from './dao/managerFS/ProductManager.js';
 import mongoose from 'mongoose';
 import ProductMongoManager from './dao/managerDB/ProductMongoManager.js';
 import CartMongoManager from './dao/managerDB/CartMongoManager.js';
 import { messageModel } from './dao/models/messages.models.js';
+import viewsRoutes from './routes/views.routes.js';
+
 
 const PORT = 8080;
 const app = express();
-//const productManager = new ProductManager('./src/productos.json')
+
 const productMongoManager = new ProductMongoManager();
 const cartMongoManager = new CartMongoManager();
 
@@ -22,13 +22,14 @@ app.use(express.static('public'));
 
 mongoose.connect('mongodb+srv://cristianrui98:cristian3564332149@cristian.sevvzhl.mongodb.net/ecommerce')
 
+
 const hbs = handlebars.create({
     runtimeOptions: {
         allowProtoPropertiesByDefault: true
     }
 });
 
-app.engine('handlebars', hbs.engine());
+app.engine('handlebars', hbs.engine);
 app.set('views', 'src/views');
 app.set('view engine', 'handlebars');
 
@@ -48,14 +49,16 @@ export const io = new Server(httpServer);
 
 io.on('connection', socket => {
     socket.on('loadProducts', async () => {
-        io.emit('update-products', await productMongoManager.getProducts())
+        const productList = await productMongoManager.getProducts();
+        io.emit('update-products', productList.payload)
+
     })
 
     socket.on('delete-product', async (productID) => {
-
         try {
             await productMongoManager.deleteProduct(productID);
-            io.emit('update-products', await productMongoManager.getProducts());
+            const productList = await productMongoManager.getProducts();
+            io.emit('update-products', productList.payload);
 
         } catch (error) {
             console.error(error);
@@ -80,8 +83,33 @@ io.on('connection', socket => {
     });
 
     socket.on('newUser', data => {
-        io.emit('newConnection', 'un nuevo usuario se conecto');
         socket.broadcast.emit('notification', data);
-    })
+    });
 
-})
+    //products socket 
+
+    socket.on('newCart', async () => {
+        try {
+            const newCart = await cartMongoManager.addCart()
+            socket.emit('newCart', newCart)
+        } catch (error) {
+            console.error(error);
+        };
+    });
+
+    socket.on('addProduct', async data => {
+        try {
+            const { cartId, productId, quantity } = data;
+
+            const addedProduct = await cartMongoManager.addProductToCart(cartId, productId, quantity);
+
+            if (!addedProduct) {
+                console.error({ message: 'There was a problem adding the product to the cart' })
+            };
+
+            socket.emit('addedProduct')
+        } catch (error) {
+            console.error(error);
+        };
+    });
+});

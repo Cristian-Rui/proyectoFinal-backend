@@ -1,19 +1,51 @@
 <section class="container">
-    <h1 style=color:blue>CARGAR PRODUCTO</h1>
+    <h1 class="text-center" style=color:blue>CARGAR PRODUCTO</h1>
 
-    <form action="/api/products" method="post" enctype="multipart/form-data"
-        style="" id="form" class="d-flex flex-column w-50">
-        <label for="title">nombre:</label><input id="title" name="title" type="text"></input>
-        <label for="description">descripcion del producto:</label><textarea id="description" name="description"
-            type="text" style="height: 182px"></textarea>
-        <label for="price">precio:</label><input id="price" name="price" type="number"></input>
-        <label for="thumbnail">imagen del producto:</label><input id="thumbnail" name="thumbnail" type="file"
-            required></input>
-        <label for="code">codigo del producto:</label><input id="code" name="code" type="text"></input>
-        <label for="stock">cantidad en stock:</label><input id="stock" name="stock" type="number"></input>
-        <label for="category">categoria:</label><input id="category" name="category" type="text"></input>
-        <label for="productStatus">status:</label><input type="text" id="productStatus" name="productStatus" placeholder="true o false"></input>
-        <button type="submit" id="sendProduct">agregar producto</button>
+    <form action="/api/products" method="post" enctype="multipart/form-data" style="" id="form"
+        class="d-flex flex-column w-100 align-items-center">
+        <div class="d-flex flex-column m-1 w-50">
+            <label for="title">nombre:</label><input id="title" name="title" type="text"></input>
+        </div>
+        <div class="d-flex flex-column m-1 w-50">
+            <label for="description">descripcion del producto:</label><textarea id="description" name="description"
+                type="text" style="height: 182px"></textarea>
+        </div>
+        <div class="d-flex flex-column m-1 w-50">
+            <label for="price">precio:</label><input id="price" name="price" type="number"></input>
+        </div>
+        <div class="d-flex flex-column m-1 w-50">
+            <label for="thumbnail">imagen del producto:</label><input id="thumbnail" name="thumbnail" type="file"
+                required></input>
+        </div>
+        <div class="d-flex flex-column m-1 w-50">
+            <label for="code">codigo del producto:</label><input id="code" name="code" type="text"></input>
+        </div>
+        <div class="d-flex flex-column m-1 w-50">
+            <label for="stock">cantidad en stock:</label><input id="stock" name="stock" type="number"></input>
+        </div>
+        <div class="d-flex flex-column m-1 w-50">
+            <label for="category">categoria:</label> <select class="form-select" id="category" name="category"
+                aria-label="seleccione una categoria">
+                <option selected="">categoria</option>
+                <option value="whisky">Whisky</option>
+                <option value="vino">Vino</option>
+                <option value="accesorios">Accesorios</option>
+                <option value="cervezas">Cervezas</option>
+                <option value="almacen">Almacen</option>
+                <option value="higiene">Higiene</option>
+                <option value="limpieza">Limpieza</option>
+            </select>
+        </div>
+        <div class="d-flex flex-column m-1 w-50">
+            <label for="productStatus">status:</label><select class="form-select" id="productStatus" name="productStatus"
+                aria-label="seleccione el estado del producto">
+                <option selected="">status</option>
+                <option value="true">True</option>
+                <option value="false">False</option>
+            </select>
+        </div>
+
+        <button type="submit" id="sendProduct" class="m-1 p-2 w-50">agregar producto</button>
     </form>
 
     <section>

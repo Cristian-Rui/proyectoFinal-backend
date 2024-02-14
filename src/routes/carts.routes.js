@@ -1,10 +1,7 @@
 import { Router } from "express";
-//import CartManager from "../dao/managerFS/CartManager.js";
 import CartMongoManager from "../dao/managerDB/CartMongoManager.js";
 
 const cartRoutes = Router();
-//const cartManager = new CartManager('./src/carts.json')
-//const carts = await cartManager.getCarts()
 const cartMongoManager = new CartMongoManager();
 
 cartRoutes.get('/', async (req, res) => {
@@ -35,7 +32,7 @@ cartRoutes.get('/:cartId', async (req, res) => {
             return res.status(404).send({ message: 'Products not found' })
         };
 
-        res.status(200).json({ productsCartById })
+        res.status(200).json(productsCartById)
     } catch (error) {
         res.status(500).json({ message: 'There was a problem', error: error });
     }
@@ -57,5 +54,92 @@ cartRoutes.post('/:cartId/product/:productId', async (req, res) => {
     }
 })
 
+cartRoutes.delete('/:cartId/products/:productId', async (req, res) => {
+    try {
+        const { cartId } = req.params;
+        const { productId } = req.params;
+
+        const deleteOneProduct = await cartMongoManager.deleteProductOfCart(cartId, productId);
+
+        if (!deleteOneProduct) {
+            return res.status(400).send({ error: 'Error removing product from cart' });
+        };
+
+        res.status(200).json({ message: 'Product successfully removed' });
+
+    } catch (error) {
+        res.status(500).json({ message: 'There was a problem', error: error });
+    };
+});
+
+cartRoutes.delete('/:cartId', async (req, res) => {
+    try {
+        const { cartId } = req.params;
+
+        const deleteAllProducts = await cartMongoManager.deleteAllProductsOfCart(cartId);
+
+        if (!deleteAllProducts) {
+            return res.status(400).send({ error: 'Error removing products from cart' });
+        };
+
+        res.status(200).json({ message: 'Products successfully removed' });
+
+    } catch (error) {
+        res.status(500).json({ message: 'There was a problem', error: error });
+    }
+})
+
+cartRoutes.put('/:cartId', async (req, res) => {
+    try {
+        const { cartId } = req.params;
+        const products = req.body;
+        const updatedCart = await cartMongoManager.updateAllCart(cartId, products);
+
+        if (!updatedCart) {
+            return res.status(400).send({ error: 'Error updating cart products' });
+        };
+
+        const productsOfCartList = await cartMongoManager.getProductsOfCart(cartId)
+
+        productsOfCartList.map(async product => {
+            if (product.quantity <= 0) {
+                await cartMongoManager.deleteProductOfCart(cartId, product.product);
+            };
+        });
+
+        res.status(200).json({ message: 'Products successfully updated' });
+    } catch (error) {
+        res.status(500).json({ message: 'There was a problem', error: error });
+    }
+})
+
+cartRoutes.put('/:cartId/products/:productId', async (req, res) => {
+    try {
+        const { cartId } = req.params;
+        const { productId } = req.params;
+        const { quantity } = req.body;
+
+        const updatingProduct = await cartMongoManager.updateProductOfCart(cartId, productId, quantity);
+
+        if (!updatingProduct) {
+            return res.status(400).send({ error: 'Error updating cart products' });
+        }
+
+        const productsOfCartList = await cartMongoManager.getProductsOfCart(cartId);
+        
+        const filteredList = productsOfCartList.filter(product => product.quantity <= 0)
+        
+        console.log(filteredList.length)
+        
+        if (filteredList.length !== 0) {
+            filteredList.map(product => cartMongoManager.deleteProductOfCart(cartId, product.product))
+        }
+        
+        res.status(200).json({ message: 'Product successfully updated' });
+
+    } catch (error) {
+        res.status(500).json({ message: 'There was a problem', error: error });
+    }
+})
 
 export default cartRoutes;

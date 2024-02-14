@@ -11,8 +11,26 @@ const productMongoManager = new ProductMongoManager();
 
 productsRoutes.get('/', async (req, res) => {
     try {
-        productList = await productMongoManager.getProducts();
-        res.status(200).render('home', { productList });
+        const { limit = 10, page = 1, query = '', sort = '' } = req.query;
+
+        const productList = await productMongoManager.getProducts(limit, page, query, sort);
+        
+        if(productList.hasPrevPage){
+            productList.prevLink =  `/api/products?limit=${limit}&page=${+page-1}&query=${query}&sort=${sort}`;
+        }else{
+            productList.prevLink = null;
+        };
+        if(productList.hasNextPage){
+            productList.nextLink =  `/api/products?limit=${limit}&page=${+page+1}&query=${query}&sort=${sort}`;
+        }else{
+            productList.nextLink = null;
+        }
+
+        if (!productList) {
+            res.status(404).json({ message: 'products not found' })
+        }
+
+        res.status(200).send({ productList });
     } catch (error) {
         res.status(500).json({ message: 'There was a problem', error: error });
     }
@@ -37,7 +55,8 @@ productsRoutes.get('/:productId', async (req, res) => {
 
 
 productsRoutes.post('/', uploader.single('thumbnail'), async (req, res) => {
-    let  product  = req.body;
+    let product = req.body;
+    console.log(product)
     const path = req.file.path.split('public').join('');
 
     try {

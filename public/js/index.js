@@ -18,7 +18,7 @@ socket.on('update-products', (products) => {
 
     products.forEach((product) => {
         productList.innerHTML += `
-        <div class="card col-4 m-1 productItem" data-id='${product.id}'>
+        <div class="card col-4 m-1 productItem" data-id='${product._id}'>
             <img src="${product.thumbnail}" class="card-img-top img-fluid" alt="${product.title}">
             <div class="card-body">
                     <h3 class="card-title">${product.title}</h3>
@@ -41,9 +41,7 @@ socket.on('update-products', (products) => {
     document.querySelectorAll('.productItem').forEach((button) => {
         button.addEventListener('click', (event) => {
             const productItem = event.target.closest('.productItem');
-            const productId = parseInt(productItem.dataset.id) ;
-
-            console.log('btn delete clicked', productId);
+            const productId = productItem.dataset.id ;
 
             socket.emit('delete-product', productId);
 

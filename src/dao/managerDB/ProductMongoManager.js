@@ -2,10 +2,17 @@ import { productModel } from "../models/product.model.js";
 
 class ProductMongoManager {
 
-    async getProducts() {
+    async getProducts(limit = 10, page = 1, query = '', sort = '') {
         try {
-            const productList = await productModel.find().lean();
-            return productList;
+            const [code, value] = query.split(':');
+            const productList = await productModel.paginate({ [code]: value }, {
+                limit,
+                page,
+                sort: sort ? { price: sort } : {}
+            });
+            productList.payload = productList.docs;
+            delete productList.docs;
+            return { ...productList };
         } catch (error) {
             console.error('products not found');
             return [];
@@ -37,7 +44,7 @@ class ProductMongoManager {
     async getProductById(idProduct) {
 
         try {
-            const searchedProduct = await productModel.findOne({ _id: idProduct })
+            const searchedProduct = await productModel.findOne({ _id: idProduct }).lean()
             if (searchedProduct) {
                 return { searchedProduct };
             } else {
