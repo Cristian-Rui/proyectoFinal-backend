@@ -56,7 +56,7 @@ productsRoutes.get('/:productId', async (req, res) => {
 
 productsRoutes.post('/', uploader.single('thumbnail'), async (req, res) => {
     let product = req.body;
-    console.log(product)
+    
     const path = req.file.path.split('public').join('');
 
     try {

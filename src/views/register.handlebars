@@ -1,0 +1,38 @@
+<h1 class="text-center" style=color:blue>Distribuidora MASI</h1>
+<h3 class="text-center" style=color:gray>Formulario de registro</h3>
+
+<form action="/api/session/register" method="post" class="d-flex flex-column w-100 align-items-center">
+
+    <div class="d-flex flex-column m-1 w-50">
+        <label for="">Nombre</label> <input type="text" name="firstName">
+    </div>
+
+    <div class="d-flex flex-column m-1 w-50">
+        <label for="">Apellido</label> <input type="text" name="lastName">
+    </div>
+
+    <div class="d-flex flex-column m-1 w-50">
+        <label for="">Edad</label> <input type="number" name="age">
+    </div>
+
+    <div class="d-flex flex-column m-1 w-50">
+        <label for="">Password</label> <input type="password" name="password">
+    </div>
+
+    <div class="d-flex flex-column m-1 w-50">
+        <label for="">Email</label> <input type="email" name="email">
+    </div>
+
+    <div class="d-flex flex-column m-1 w-50">
+        <label for="role">Rol del usuario:</label> <select class="form-select" id="role" name="role" aria-label="rol">
+            <option selected="">seleccione un Rol</option>
+            <option value="user">Usuario</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary m-1 p-2 w-50">Registrar</button>
+</form>
+
+<div class="container d-flex flex-column w-50 align-items-center my-5">
+    <h3 style=color:gray>Si ya tienes una cuenta dirigete a iniciar sesión</h3>
+    <a href="/login" class="btn btn-success m-1 p-2 w-50">Ir a iniciar sesión</a>
+</div>

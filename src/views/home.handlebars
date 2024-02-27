@@ -1,41 +1,14 @@
-<h1>LISTA DE PRODUCTOS</h1>
-<h2>Productos:</h2>
-<section class="container">
-        <div class="row justify-content-around">
-                {{#each productList}}
-                <div class="card col-4 m-1">
-                        <img src="{{this.thumbnail}}" class="card-img-top img-fluid" alt="{{this.title}}">
-                        <div class="card-body">
-                                <h3 class="card-title">{{this.title}}</h3>
-                                <h4 class="card-title">precio: ${{this.price}}</h4>
-                                <p class="card-text">{{this.description}}</p>
-                        </div>
-                        <ul class="list-group list-group-flush">
-                                <li class="list-group-item">codigo:{{this.code}}</li>
-                                <li class="list-group-item">stock: {{this.stock}}</li>
-                                <li class="list-group-item">categoria: {{this.category}}</li>
-                                <li class="list-group-item">id: {{this._id}}</li>
-                                <li class="list-group-item text-success">status: {{this.productStatus}}</li>
-                        </ul>
-                        <div class="card-body">
-                                <button type="button" class="btn btn-success ">comprar</button>
-                                <button type="button" class="btn btn-danger ">eliminar</button>
-                        </div>
-                </div>
-                {{/each}}
-        </div>
-</section>
+<h1 class="text-center" >Bienvenido a la tienda de Distribuidora MASI</h1>
 
+<h2 class="text-center" style=color:gray>¿Cómo estas {{user.firstName}}?</h2>
 
+<div class="container d-flex flex-column w-50 align-items-center my-5">
+<h3 class="text-center" style=color:gray>¡Puedes ingresar a nuestro catálogo desde aqui!</h3>
+<a href="/products" class="btn btn-secondary m-1 p-2 w-50">Ir al catálogo</a>
+</div>
 
-{{!-- <div class="col-4" style="border: 1px solid black; margin:3px;">
-        <img src="{{this.thumbnail}}" class="img-fluid rounded" alt="{{this.title}}">
-        <h3>{{this.title}}</h3>
-        <p>precio: ${{this.price}}</p>
-        <p>{{this.description}}</p>
-        <p>codigo:{{this.code}}</p>
-        <p>stock: {{this.stock}}</p>
-        <p>categoria: {{this.category}}</p>
-        <p>id: {{this.id}}</p>
-        <p style="color: greenyellow;">status: {{this.status}}</p>
-</div> --}}
+<div class="container d-flex flex-column w-50 align-items-center my-5">
+<button id="logoutBtn" class="btn btn-danger m-1 p-2 w-50" type="button">Cerrar sesión</button>
+</div>
+
+<script src="js/session.js"></script>

@@ -2,32 +2,35 @@ import { Router } from "express";
 import { productModel } from "../dao/models/product.model.js";
 import ProductMongoManager from "../dao/managerDB/ProductMongoManager.js";
 import CartMongoManager from "../dao/managerDB/CartMongoManager.js";
+import { checkExistingUser, checkAuth, onlyAdmins } from "../middlewares/auth.js";
 
 
 const viewsRoutes = Router();
 const productMongoManager = new ProductMongoManager();
 const cartMongoManager = new CartMongoManager()
 
-viewsRoutes.get('/', async (req, res) => {
+viewsRoutes.get('/', checkAuth, async (req, res) => {
     try {
-        const productList = await productModel.find().lean();
-        console.log(productList)
-        res.status(200).render('home', { productList, title: 'Home', style: 'style.css' });
+        const { user } = req.session;
+
+        
+
+        res.status(200).render('home', { user, title: 'Home', style: 'style.css' });
     } catch (error) {
         console.error(error);
         res.status(400).json({ message: 'users not found' });
     }
 })
 
-viewsRoutes.get('/realTimeProducts', (req, res) => {
+viewsRoutes.get('/realTimeProducts', checkAuth, onlyAdmins, (req, res) => {
     res.render('realTimeProducts', { title: 'Cargar un producto', style: 'style.css' })
 })
 
-viewsRoutes.get('/chat', (req, res) => {
+viewsRoutes.get('/chat', checkAuth, (req, res) => {
     res.render('chat', { title: 'Chat en vivo', style: 'style.css' });
 });
 
-viewsRoutes.get('/products', async (req, res) => {
+viewsRoutes.get('/products', checkAuth, async (req, res) => {
     try {
         const { limit = 10, page = 1, query = '', sort = '' } = req.query;
 
@@ -56,7 +59,7 @@ viewsRoutes.get('/products', async (req, res) => {
     };
 });
 
-viewsRoutes.get('/products/:productId', async (req, res) => {
+viewsRoutes.get('/products/:productId', checkAuth, async (req, res) => {
     try {
         const { productId } = req.params;
 
@@ -68,7 +71,7 @@ viewsRoutes.get('/products/:productId', async (req, res) => {
     };
 })
 
-viewsRoutes.get('/carts/:cartId', async (req, res) => {
+viewsRoutes.get('/carts/:cartId', checkAuth, async (req, res) => {
     try {
         const { cartId } = req.params;
 
@@ -81,6 +84,15 @@ viewsRoutes.get('/carts/:cartId', async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'There was a problem', error: error });
     }
-})
+});
+
+viewsRoutes.get('/register', checkExistingUser, (req, res) => {
+    res.render('register');
+});
+
+viewsRoutes.get('/login', checkExistingUser, (req, res) => {
+    res.render('login');
+});
+
 
 export default viewsRoutes;
