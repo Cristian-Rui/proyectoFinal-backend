@@ -11,6 +11,9 @@ import viewsRoutes from './routes/views.routes.js';
 import sessionRoutes from './routes/session.routes.js';
 import MongoStore from 'connect-mongo';
 import session from 'express-session';
+import initializePassport from './config/passport.config.js';
+import passport from 'passport';
+
 
 
 const PORT = 8080;
@@ -31,6 +34,10 @@ app.use(session({
     resave: true,
     saveUninitialized: true
 }));
+
+initializePassport();
+app.use(passport.initialize());
+app.use(passport.session());
 
 mongoose.connect('mongodb+srv://cristianrui98:cristian3564332149@cristian.sevvzhl.mongodb.net/ecommerce')
 

@@ -94,5 +94,9 @@ viewsRoutes.get('/login', checkExistingUser, (req, res) => {
     res.render('login');
 });
 
+viewsRoutes.get('/restorepassword', checkExistingUser, (req, res) => {
+    res.render('restorepassword');
+});
+
 
 export default viewsRoutes;
