@@ -1,25 +1,27 @@
 const socket = io();
-
 let user;
 
-//Alert para identificacion
-Swal.fire({
-    title: "Bienvenida/o al chat en vivo",
-    input: "email",
-    inputLabel: "Ingrese su dirección de correo electrónico",
-    inputPlaceholder: "ejemplo@algo.com"
-}).then(data => {
-    user = data.value;
-    socket.emit('newUser', user);
-});
+window.addEventListener('DOMContentLoaded',async (e) => {
+    const result = await fetch('http://localhost:8080/api/session/getUser', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    const response = await result.json();
+
+    user = response.payload
+
+    socket.emit('newUser', user.email);
+})
 
 
-const inputData = document.getElementById('inputData') ;
+const inputData = document.getElementById('inputData');
 
 inputData.addEventListener('keyup', (event) => {
     if (event.key === 'Enter') {
         if (!!inputData.value.trim()) {
-            socket.emit('message', { user: user, message: inputData.value.trim() })
+            socket.emit('message', { user: user.email, message: inputData.value.trim() })
 
         }
         inputData.value = '';
@@ -27,7 +29,7 @@ inputData.addEventListener('keyup', (event) => {
 });
 
 socket.on('allMessages', data => {
-    let messages = document.getElementById('outputData');  
+    let messages = document.getElementById('outputData');
     messages.innerHTML = '';
     data.forEach(message => {
         messages.innerHTML += `
@@ -40,7 +42,7 @@ socket.on('allMessages', data => {
         </div>
     </div>
         `
-    });   
+    });
 });
 
 socket.on('notification', user => {

@@ -3,9 +3,13 @@ import local from 'passport-local';
 import { userModel } from '../dao/models/user.model.js';
 import { createHash, isValidPassword } from "../utils/bcrypt.js";
 import { Strategy as GithubStrategy } from "passport-github2";
+import { Strategy as JWTStrategy, ExtractJwt } from 'passport-jwt'
+import CartMongoManager from "../dao/managerDB/CartMongoManager.js";
+import { secret } from "./const.js";
 
 
 const localStrategy = local.Strategy;
+const cartMongoManager = new CartMongoManager()
 
 const initializePassport = () => {
 
@@ -23,18 +27,22 @@ const initializePassport = () => {
                         icon: "warning",
                         html: `<b>Please log in by <a href="/login">clicking here</a></b>`
                     });
+
+                    return done(null, false);
                 };
 
-                const result = await userModel.create({
+                const newCart = await cartMongoManager.addCart()
+                const newUser = await userModel.create({
                     firstName,
                     lastName,
                     email,
                     age,
                     password: createHash(password),
-                    role
+                    role,
+                    cart: newCart._id
                 });
 
-                return done(null, result);
+                return done(null, newUser);
             } catch (error) {
                 return done('There was a problem registering the user, try again later' + error)
             };
@@ -56,7 +64,7 @@ const initializePassport = () => {
                     return done(null, false);
                 };
 
-                if (!isValidPassword) {
+                if (!isValidPassword(user, password)) {
                     Swal.fire({
                         title: "Wrong email or password",
                         icon: "warning",
@@ -66,7 +74,7 @@ const initializePassport = () => {
                 };
 
                 return done(null, user);
-            } catch {
+            } catch (error) {
                 return done("There was a problem logging in, please try again later" + error);
             };
         }
@@ -74,21 +82,22 @@ const initializePassport = () => {
 
     passport.use('github', new GithubStrategy(
         {
-            clientID:'Iv1.acc1f53e1783cf8a',
-            callbackURL:'http://localhost:8080/api/session/githubcallback',
-            clientSecret:'e0a6d3d12b5a24128fb278f5a702af140d01da58'
+            clientID: 'Iv1.acc1f53e1783cf8a',
+            callbackURL: 'http://localhost:8080/api/session/githubcallback',
+            clientSecret: 'e0a6d3d12b5a24128fb278f5a702af140d01da58'
         },
         async (accessToken, refreshToken, profile, done) => {
             try {
-                console.log({profile});
-                const user = await userModel.findOne({email: profile._json.email});
-                if(!user){
+                const user = await userModel.findOne({ email: profile._json.email });
+                const newCart = await cartMongoManager.addCart()
+                if (!user) {
                     const newUser = {
                         firstName: profile._json.name.split(' ')[0],
                         lastName: profile._json.name.split(' ')[1],
                         age: 18,
                         email: profile._json.email,
-                        password: 'GithubGenerated'
+                        password: 'GithubGenerated',
+                        cart: newCart._id
                     }
                     const result = await userModel.create(newUser);
                     return done(null, result);
@@ -98,7 +107,27 @@ const initializePassport = () => {
                 return done(error);
             }
         }
-    ))
+    ));
+
+    const cookieExtractor = (req) => {
+        const cookies = req.headers.cookie
+        const token = cookies.split('cookieToken=')[1].split(';')[0];
+        return token;
+    };
+
+    passport.use('jwt', new JWTStrategy(
+        {
+            jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
+            secretOrKey: secret
+        },
+        async (jwt_payload, done) => {
+            try {
+                return done(null, jwt_payload);
+            } catch (error) {
+                return done('there was a problem whit token' + error);
+            };
+        }
+    ));
 
     passport.serializeUser((user, done) => {
         done(null, user._id)

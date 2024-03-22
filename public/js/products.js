@@ -1,28 +1,26 @@
 const socket = io();
 
-document.addEventListener('DOMContentLoaded', async () => {
-    if (!localStorage.getItem('cartId')) {
-        socket.emit('newCart')
-    }
-
-});
-
-socket.on('newCart', data => {
-    const jsonId = JSON.stringify(data._id);
-    localStorage.setItem('cartId', jsonId);
-})
-
-
 document.querySelectorAll('.addCartButton').forEach((button) => {
     button.addEventListener('click', async (event) => {
         try {
-            const productItem = event.target.closest('.addCartButton');
-            
-            const productId = productItem.dataset.id;
-            
-            const cartId = JSON.parse(localStorage.getItem('cartId'))
 
-            socket.emit('addProduct', { cartId: cartId, productId: productId })
+            const result = await fetch('http://localhost:8080/api/session/getUser', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const response = await result.json();
+            const user = response.payload
+
+            const productItem = event.target.closest('.addCartButton');
+
+            const productId = productItem.dataset.id;
+
+            const cartId = user.cart
+
+            socket.emit('addProduct', { cartId: cartId, productId: productId, quantity: 1 })
 
         } catch (error) {
             console.error(error);

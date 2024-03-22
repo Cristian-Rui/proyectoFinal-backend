@@ -1,80 +1,104 @@
-import { Router } from "express";
+import { Router } from "./router.js";
 import passport from "passport";
 import { userModel } from "../dao/models/user.model.js";
 import { checkAdmins } from "../middlewares/auth.js";
 import { createHash } from "../utils/bcrypt.js";
+import jwt from 'jsonwebtoken'
+import { secret } from "../config/const.js";
 
-const sessionRoutes = Router();
+export default class SessionRoutes extends Router {
 
-sessionRoutes.post('/register', checkAdmins, passport.authenticate('register'), async (req, res) => {
-    const { email } = req.body
-    try {
-        const user = await userModel.findOne({ email })
-        req.session.user = user;
-        res.status(201).redirect('/');
-    } catch (error) {
-        console.error(error);
-        res.status(400).send({ error });
-    }
-});
+    init() {
+        this.post('/register', ['PUBLIC'], checkAdmins, passport.authenticate('register'), async (req, res) => {
+            try {
+                const { email, firstName, lastName, age, cart, role } = req.body
 
-sessionRoutes.post('/login', passport.authenticate('login'), async (req, res) => {
-    try {
-        if (!req.user) {
-            return res.status(400).send({ message: 'error with credentials' })
-        }
-        req.session.user = {
-            firstName: req.user.firstName,
-            lastName: req.user.lastName,
-            email: req.user.email,
-            age: req.user.age,
-            role: req.user.role
-        };
-        res.redirect('/');
-    } catch (error) {
-        res.status(400).send({ error });
-    }
-});
+                const token = jwt.sign({ email, firstName, lastName, age, cart, role },
+                    secret, { expiresIn: '24h' });
 
-sessionRoutes.post('/logout', async (req, res) => {
-    try {
-        req.session.destroy((err) => {
-            if (err) {
-                return res.status(500).json({ message: 'Logout failed' });
+                res.cookie('cookieToken', token, {
+                    maxAge: 60 * 60 * 1000,
+                    httpOnly: true
+                }).redirect('/');
+            } catch (error) {
+                res.sendServerError(error.message)
             }
         });
-        res.send({ redirect: 'http://localhost:8080/login' });
-    } catch (error) {
-        res.status(400).send({ error });
+
+        this.post('/login', ['PUBLIC'], passport.authenticate('login'), async (req, res) => {
+            try {
+                const { email, firstName, lastName, age, cart, role } = req.user;
+
+                const token = jwt.sign({ email, firstName, lastName, age, cart, role },
+                    secret, { expiresIn: '24h' });
+
+                res.cookie('cookieToken', token, {
+                    maxAge: 60 * 60 * 1000,
+                    httpOnly: true
+                }).redirect('/');
+            } catch (error) {
+                res.sendServerError(error.message)
+            }
+        });
+
+        this.post('/logout', ['USER', 'ADMIN'], async (req, res) => {
+            try {
+                res.clearCookie('cookieToken').redirect('/login')
+            } catch (error) {
+                res.sendServerError(error.message)
+            }
+        })
+
+        this.post('/restorepassword', ['PUBLIC'], async (req, res) => {
+            try {
+                const { email, newPassword } = req.body;
+
+                const user = await userModel.findOne({ email });
+                if (!user) {
+                    return res.status(401).send({ message: 'unauthorized' })
+                };
+                user.password = createHash(newPassword);
+                await user.save();
+                res.sendSuccess('password updated')
+            } catch (error) {
+                res.sendServerError(error.message)
+            }
+        })
+
+        this.get("/github", ['PUBLIC'], passport.authenticate("github", { scope: ["user:email"] }), (req, res) => {
+
+        }
+        );
+
+        this.get("/githubcallback", ['PUBLIC'], passport.authenticate("github", { failureRedirect: "/login" }), (req, res) => {
+            try {
+                const { email, firstName, lastName, age, cart, role } = req.user;
+
+                const token = jwt.sign({ email, firstName, lastName, age, cart, role },
+                    secret, { expiresIn: '24h' });
+
+                res.cookie('cookieToken', token, {
+                    maxAge: 60 * 60 * 1000,
+                    httpOnly: true
+                }).redirect('/');
+            } catch (error) {
+                res.sendServerError(error.message)
+            }
+        }
+        );
+
+        this.get('/getUser',['USER','ADMIN'], (req, res) => {
+            const { email, firstName, lastName, age, cart, role } = req.user;
+            const user = {
+                email,
+                firstName,
+                lastName,
+                age,
+                cart,
+                role
+            }
+            res.sendSuccess(user);
+        });
     }
-});
-
-sessionRoutes.post('/restorepassword', async (req, res) => {
-    try {
-        const { email, newPassword } = req.body;
-
-        const user = await userModel.findOne({ email });
-        if (!user) {
-            return res.status(401).send({ message: 'unauthorized' })
-        };
-        user.password = createHash(newPassword);
-        await user.save();
-        res.send({ message: 'password updated' });
-    } catch (error) {
-        console.error(error);
-        res.status(400).send({ error });
-    }
-})
-
-sessionRoutes.get("/github", passport.authenticate("github", { scope: ["user:email"] }), (req, res) => {
 
 }
-);
-
-sessionRoutes.get("/githubcallback",  passport.authenticate("github", { failureRedirect: "/login" }), (req, res) => {
-    req.session.user = req.user;
-    res.redirect("/");
-}
-);
-
-export default sessionRoutes;

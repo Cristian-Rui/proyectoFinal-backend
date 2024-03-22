@@ -1,12 +1,5 @@
-export const checkAuth = (req, res, next) => {
-    if (!req.session.user) {
-        return res.redirect('/login');
-    }
-    next();
-};
-
 export const checkExistingUser = (req, res, next) => {
-    if (req.session.user) {
+    if (req.user) {
         return res.redirect('/');
     }
     next();
@@ -24,11 +17,3 @@ export const checkAdmins = (req, res, next) => {
     };
     next()
 };
-
-export const onlyAdmins = (req, res, next) => {
-    const user = req.session.user;
-    if (user.role !== 'admin') {
-        return res.redirect('/');
-    }
-    next()
-}

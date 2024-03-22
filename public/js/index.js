@@ -31,7 +31,6 @@ socket.on('update-products', (products) => {
                     <li class="list-group-item">categoria: ${product.category}</li>
             </ul>
             <div class="card-body">
-                    <button type="button" class="btn btn-success ">comprar</button>
                     <button type="button" class="btn btn-danger">eliminar</button>
             </div>
         </div>

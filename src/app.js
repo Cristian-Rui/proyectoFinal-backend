@@ -1,19 +1,19 @@
 import express from 'express'
 import { Server } from "socket.io";
 import handlebars from 'express-handlebars'
-import productsRoutes from './routes/products.routes.js';
-import cartRoutes from './routes/carts.routes.js';
 import mongoose from 'mongoose';
 import ProductMongoManager from './dao/managerDB/ProductMongoManager.js';
 import CartMongoManager from './dao/managerDB/CartMongoManager.js';
 import { messageModel } from './dao/models/messages.models.js';
-import viewsRoutes from './routes/views.routes.js';
-import sessionRoutes from './routes/session.routes.js';
+import SessionRoutes from './routes/session.routes.js';
 import MongoStore from 'connect-mongo';
 import session from 'express-session';
 import initializePassport from './config/passport.config.js';
 import passport from 'passport';
-
+import { secret } from './config/const.js';
+import ProductRoutes from './routes/products.routes.js';
+import CartRoutes from './routes/carts.routes.js';
+import ViewsRoutes from './routes/views.routes.js';
 
 
 const PORT = 8080;
@@ -27,9 +27,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
 app.use(session({
-    secret: 'Cr1st1anRv1',
+    secret: secret,
     store: MongoStore.create({
-        mongoUrl:'mongodb+srv://cristianrui98:cristian3564332149@cristian.sevvzhl.mongodb.net/ecommerce',
+        mongoUrl: 'mongodb+srv://cristianrui98:cristian3564332149@cristian.sevvzhl.mongodb.net/ecommerce',
     }),
     resave: true,
     saveUninitialized: true
@@ -51,14 +51,18 @@ app.engine('handlebars', hbs.engine);
 app.set('views', 'src/views');
 app.set('view engine', 'handlebars');
 
+const sessionRoutes = new SessionRoutes();
+const productRoutes = new ProductRoutes();
+const cartRoutes = new CartRoutes();
+const viewsRoutes = new ViewsRoutes();
 
-app.use('/api/products', productsRoutes);
+app.use('/api/products', productRoutes.getRouter());
 
-app.use('/api/cart', cartRoutes);
+app.use('/api/cart', cartRoutes.getRouter());
 
-app.use('/api/session', sessionRoutes);
+app.use('/api/session', sessionRoutes.getRouter());
 
-app.use('/', viewsRoutes);
+app.use('/', viewsRoutes.getRouter());
 
 const httpServer = app.listen(PORT, () => {
     console.log(`servidor funcionando en puerto ${PORT}`);
@@ -70,20 +74,23 @@ export const io = new Server(httpServer);
 
 io.on('connection', socket => {
     socket.on('loadProducts', async () => {
-        const productList = await productMongoManager.getProducts();
-        io.emit('update-products', productList.payload)
-
-    })
+        const info =  await productMongoManager.getProducts();
+        const limit = info.totalDocs
+        const productList = await productMongoManager.getProducts(limit);
+        io.emit('update-products', productList.payload);
+    });
 
     socket.on('delete-product', async (productID) => {
         try {
             await productMongoManager.deleteProduct(productID);
-            const productList = await productMongoManager.getProducts();
+            const info =  await productMongoManager.getProducts();
+            const limit = info.totalDocs
+            const productList = await productMongoManager.getProducts(limit);
             io.emit('update-products', productList.payload);
 
         } catch (error) {
             console.error(error);
-        }
+        };
 
     });
 
@@ -99,23 +106,12 @@ io.on('connection', socket => {
 
         } catch (error) {
             console.error(error);
-        }
+        };
 
     });
 
     socket.on('newUser', data => {
         socket.broadcast.emit('notification', data);
-    });
-
-    //products socket 
-
-    socket.on('newCart', async () => {
-        try {
-            const newCart = await cartMongoManager.addCart()
-            socket.emit('newCart', newCart)
-        } catch (error) {
-            console.error(error);
-        };
     });
 
     socket.on('addProduct', async data => {
@@ -125,10 +121,10 @@ io.on('connection', socket => {
             const addedProduct = await cartMongoManager.addProductToCart(cartId, productId, quantity);
 
             if (!addedProduct) {
-                console.error({ message: 'There was a problem adding the product to the cart' })
+                console.error({ message: 'There was a problem adding the product to the cart' });
             };
 
-            socket.emit('addedProduct')
+            socket.emit('addedProduct');
         } catch (error) {
             console.error(error);
         };

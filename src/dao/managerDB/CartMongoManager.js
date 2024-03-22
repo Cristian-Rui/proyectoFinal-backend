@@ -48,7 +48,7 @@ class CartMongoManager {
             if (existingProduct) {
                 await cartModel.updateOne(
                     { _id: cartId, 'products.product': productId },
-                    { $set: { 'products.$.quantity': quantity } }
+                    { $inc: { 'products.$.quantity': quantity } }
                 );
             } else {
                 await cartModel.updateOne(

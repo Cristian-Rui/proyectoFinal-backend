@@ -1,0 +1,1 @@
+export const secret = 'Cr1st1anRv1'

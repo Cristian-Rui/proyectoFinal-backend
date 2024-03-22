@@ -1,12 +1,21 @@
 const logoutBtn = document.getElementById('logoutBtn');
 
 logoutBtn.addEventListener('click', async (e) => {
-    const result = await fetch('http://localhost:8080/api/session/logout', {
-        method: 'post',
-        headers: {
-            'Content-Type': 'application/json'
+    try {
+        const result = await fetch('http://localhost:8080/api/session/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (result.ok) {
+            window.location.href = '/login';
+        } else {
+            console.error('Error al cerrar sesión:', result.status);
         }
-    });
-    const {redirect} = await result.json();
-    window.location.href = redirect;
+    } catch (error) {
+        console.error('Error al cerrar sesión:', error);
+    }
+
 });
